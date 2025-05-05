@@ -28,7 +28,6 @@ time_t horaDeArranque;
 // ============================ SETUP ============================
 void setup() {
   Serial.begin(115200);
-  lastUpdateId = 536953618;
 
   if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
     Serial.println("Error configurando IP estática");
@@ -48,6 +47,8 @@ void setup() {
     ultimaConexionWiFi = millis();
     Serial.println("\nConectado!");
     bot.sendMessage(CHAT_ID_AUTORIZADO, "✅ ESP32 conectado a WiFi. IP: `" + WiFi.localIP().toString() + "`", "Markdown");
+  } else {
+    Serial.println("\nError de conexión");
   }
 
   configTime(-5 * 3600, 0, "pool.ntp.org", "time.nist.gov");
@@ -57,10 +58,17 @@ void setup() {
     now = time(nullptr);
   }
 
+  /*int numMensajesIniciales = bot.getUpdates(0);
+  if (numMensajesIniciales) {
+    lastUpdateId = bot.messages[numMensajesIniciales - 1].update_id;
+    Serial.print("Último update_id inicial: ");
+    Serial.println(lastUpdateId);
+  }*/
+
+
   horaDeArranque = now;
   ultimaActividad = millis();
 
-  Serial.print("Hora de arranque (timestamp): "); Serial.println(horaDeArranque);
   bot.sendMessage(CHAT_ID_AUTORIZADO, "♻️ ESP32 ha sido reiniciado correctamente", "Markdown");
   iniciarServidorOTA();
 }
@@ -224,6 +232,10 @@ void obtenerInfoPC(String chat_id) {
   if (clientHTTP.connect(ipPC, PUERTO_FLASK)) {
     clientHTTP.print("GET /info HTTP/1.1\r\nHost: " + ipPC.toString() + "\r\nConnection: close\r\n\r\n");
 
+    String response = clientHTTP.readString();
+    Serial.println("🔽 Respuesta completa del servidor:");
+    Serial.println(response);
+
     int start = response.indexOf('{'), end = response.lastIndexOf('}');
     if (start != -1 && end != -1) {
       String jsonBody = response.substring(start, end + 1);
@@ -234,7 +246,7 @@ void obtenerInfoPC(String chat_id) {
       DeserializationError error = deserializeJson(doc, jsonBody);
 
       if (!error) {
-
+        // Construcción del mensaje usando Markdown seguro
         String msg = "*🧠 Info del PC:*\n\n";
         msg += "*Hostname:* `" + String((const char*)doc["hostname"]) + "`\n";
         msg += "*Sistema:* `" + String((const char*)doc["sistema"]) + "`\n";
@@ -263,12 +275,13 @@ void obtenerInfoPC(String chat_id) {
   }
 }
 
+
 void obtenerLogs(String chat_id) {
   WiFiClient clientHTTP;
   if (clientHTTP.connect(ipPC, PUERTO_FLASK)) {
     clientHTTP.print("GET /logs HTTP/1.1\r\nHost: " + ipPC.toString() + "\r\nConnection: close\r\n\r\n");
 
-    String response = "";
+    String response = clientHTTP.readString();
     while (clientHTTP.connected() || clientHTTP.available()) {
       if (clientHTTP.available()) {
         response += clientHTTP.readStringUntil('\n');
