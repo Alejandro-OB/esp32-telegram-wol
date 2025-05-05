@@ -28,6 +28,16 @@ This project implements a Telegram-controlled bot using an ESP32 microcontroller
   - WebServer
   - Update
 
+## Estructure
+  esp32-telegram-wol/
+  ├── esp32-telegram-wol.ino          # Main ESP32 code
+  ├── secrets.h                       # Sensitive data (token, WiFi, IPs, etc.)
+  ├── servidor/                       # Backend Flask-related files
+  │   ├── pc_control_server.py        # Flask server with routes to control the PC
+  │   ├── wol.service                 # systemd service to enable WOL at startup
+  │   └── pc_control_server.service   # systemd service to run Flask on boot
+  └── .gitignore / README.md          # Documentation and configuration files
+
 ## Setup
 
 1. Clone the repository and open the `.ino` file in the Arduino IDE.
@@ -72,12 +82,44 @@ Send any of the following commands to the bot from your authorized Telegram acco
 | /reiniciar_esp32    | Restart the ESP32                   |
 | /ayuda              | Show help menu                      |
 
+## Service Files
+
+### `pc_control_server.service`
+Service that automatically runs the Flask server on system startupma.
+
+```ini
+[Unit]
+Description=Servidor Flask para apagar y reiniciar el PC
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /ruta/completa/pc_control_server.py
+Restart=always
+User=ortega
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### `wol.service`
+Service to enable Wake-on-LAN at startup (optional if the BIOS doesn't do it by default).
+```ini
+[Unit]
+Description=Habilita Wake-on-LAN en la interfaz de red
+
+[Service]
+ExecStart=/usr/sbin/ethtool -s enp3s0 wol g
+RemainAfterExit=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Note: Replace enp3s0 with the correct name of your network interface (use ip link to verify it).
+
+
 ## Notes
 
 - Ensure the PC is configured to accept WOL packets and is on the same subnet.
 - Telegram messages sent before the ESP32 boot time are ignored.
 - For production use, consider encrypting the communication between ESP32 and the PC.
-
-## License
-
-This project is open-source and distributed under the MIT License.

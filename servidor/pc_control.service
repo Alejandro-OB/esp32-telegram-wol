@@ -1,0 +1,12 @@
+[Unit]
+Description=Servidor Flask para apagar el PC desde ESP32
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/ortega/Documentos/servidor_apagar.py
+WorkingDirectory=/home/ortega/Documentos
+User=ortega
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
