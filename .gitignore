@@ -1,0 +1,36 @@
+# Arduino build files
+*.elf
+*.hex
+*.bin
+
+# Sketch backup files
+*.ino.backup
+*.ino.save
+*.ino.~*
+
+# PlatformIO build files (optional)
+.pio
+.vscode
+
+# Arduino cache
+__pycache__/
+*.pyc
+
+# Compiled object files
+*.o
+*.a
+*.d
+
+# Secrets and local configuration
+secrets.h
+
+# Logs or temporary files
+*.log
+.DS_Store
+
+# Mac and Linux system files
+*.swp
+*.swo
+
+# Archivos sensibles
+src/secrets.h
