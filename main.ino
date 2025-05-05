@@ -1,4 +1,3 @@
-// Limpieza del código: organizado por secciones, comentarios más claros, funciones ordenadas
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -18,7 +17,7 @@ UniversalTelegramBot bot(BOT_TOKEN, client);
 WebServer otaServer(8266);
 
 // Configuración de red
-byte mac[6] = {0x34, 0x5A, 0x60, 0x4F, 0x9A, 0x02};
+
 unsigned long lastCheck = 0, lastUpdateId = 0, ultimaActividad = 0, ultimaConexionWiFi = 0;
 int reconexionesWiFi = 0, fallosWOL = 0;
 time_t horaDeArranque;
@@ -154,10 +153,6 @@ bool verificarPCEncendido(int intentos, int intervaloMs) {
 }
 
 // ============================ FUNCIONES DE COMANDOS ============================
-// Las funciones como apagarPC, reiniciarPC, obtenerInfoPC, etc. deben añadirse abajo o mantenerse si ya existen
-// Por claridad no se duplican aquí
-
-// ============================ OTA ============================
 void iniciarServidorOTA() {
   otaServer.on("/", HTTP_GET, []() {
     otaServer.send(200, "text/html", R"rawliteral(
