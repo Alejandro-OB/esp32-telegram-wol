@@ -32,7 +32,8 @@ This project implements a Telegram-controlled bot using an ESP32 microcontroller
 
   ```
   esp32-telegram-wol/
-  ├── esp32-telegram-wol.ino          # Main ESP32 code
+  ├── esp32-telegram_wol/
+  │   └── esp32_telegram_wol.ino          # Main ESP32 code
   ├── secrets.h                       # Sensitive data (token, WiFi, IPs, etc.)
   ├── servidor/                       # Backend Flask-related files
   │   ├── pc_control_server.py        # Flask server with routes to control the PC
