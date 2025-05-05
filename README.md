@@ -29,6 +29,8 @@ This project implements a Telegram-controlled bot using an ESP32 microcontroller
   - Update
 
 ## Estructure
+
+  ```
   esp32-telegram-wol/
   ├── esp32-telegram-wol.ino          # Main ESP32 code
   ├── secrets.h                       # Sensitive data (token, WiFi, IPs, etc.)
@@ -37,7 +39,7 @@ This project implements a Telegram-controlled bot using an ESP32 microcontroller
   │   ├── wol.service                 # systemd service to enable WOL at startup
   │   └── pc_control_server.service   # systemd service to run Flask on boot
   └── .gitignore / README.md          # Documentation and configuration files
-
+  ```
 ## Setup
 
 1. Clone the repository and open the `.ino` file in the Arduino IDE.
