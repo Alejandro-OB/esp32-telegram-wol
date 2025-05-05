@@ -1,4 +1,3 @@
-// Limpieza del código: organizado por secciones, comentarios más claros, funciones ordenadas
 
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -29,7 +28,7 @@ time_t horaDeArranque;
 // ============================ SETUP ============================
 void setup() {
   Serial.begin(115200);
-  lastUpdateId = 536953618; // ajuste manual para ignorar mensajes viejos
+  lastUpdateId = 536953618;
 
   if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS)) {
     Serial.println("Error configurando IP estática");
@@ -154,10 +153,7 @@ bool verificarPCEncendido(int intentos, int intervaloMs) {
 }
 
 // ============================ FUNCIONES DE COMANDOS ============================
-// Las funciones como apagarPC, reiniciarPC, obtenerInfoPC, etc. deben añadirse abajo o mantenerse si ya existen
-// Por claridad no se duplican aquí
 
-// ============================ OTA ============================
 void iniciarServidorOTA() {
   otaServer.on("/", HTTP_GET, []() {
     otaServer.send(200, "text/html", R"rawliteral(
@@ -193,7 +189,7 @@ void apagarPC(String chat_id) {
   if (clientHTTP.connect(ipPC, PUERTO_FLASK)) {
     clientHTTP.print("GET /apagar?token=" + tokenPC + " HTTP/1.1\r\nHost: " + ipPC.toString() + "\r\nConnection: close\r\n\r\n");
     bot.sendMessage(chat_id, "🛑 Comando de apagado enviado al PC.", "Markdown");
-    delay(5000); // espera antes del ping
+    delay(5000); 
     if (!estaPCEncendido()) {
       bot.sendMessage(chat_id, "🔌 Confirmado: El PC está apagado.", "Markdown");
     } else {
@@ -228,10 +224,6 @@ void obtenerInfoPC(String chat_id) {
   if (clientHTTP.connect(ipPC, PUERTO_FLASK)) {
     clientHTTP.print("GET /info HTTP/1.1\r\nHost: " + ipPC.toString() + "\r\nConnection: close\r\n\r\n");
 
-    String response = clientHTTP.readString();
-    Serial.println("🔽 Respuesta completa del servidor:");
-    Serial.println(response);
-
     int start = response.indexOf('{'), end = response.lastIndexOf('}');
     if (start != -1 && end != -1) {
       String jsonBody = response.substring(start, end + 1);
@@ -242,7 +234,7 @@ void obtenerInfoPC(String chat_id) {
       DeserializationError error = deserializeJson(doc, jsonBody);
 
       if (!error) {
-        // Construcción del mensaje usando Markdown seguro
+
         String msg = "*🧠 Info del PC:*\n\n";
         msg += "*Hostname:* `" + String((const char*)doc["hostname"]) + "`\n";
         msg += "*Sistema:* `" + String((const char*)doc["sistema"]) + "`\n";
@@ -283,7 +275,6 @@ void obtenerLogs(String chat_id) {
       }
     }
 
-    // Solo extrae la parte de texto del log (sin cabeceras HTTP)
     int bodyIndex = response.indexOf("\r\n\r\n");
     String body = (bodyIndex != -1) ? response.substring(bodyIndex + 4) : response;
 
